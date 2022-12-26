@@ -10,9 +10,6 @@ MNumber = os.environ.get("User_MN")
 MyJson = os.environ.get("TimeTable")
 Course1 = os.environ.get("Course1")
 
-# Send Massege Function.
-
-
 def send_messegse(user, messages):
     messenger = WhatsApp()
     messenger.find_user(user)
@@ -20,13 +17,13 @@ def send_messegse(user, messages):
         messenger.send_message(message)
 
 
-def get_Dayname():
+def get_day_name():
     dt = datetime.now()
     wname = dt.strftime('%A')
-    return "Monday"
+    return wname
 
 
-def get_SysTime():
+def get_sys_time():
     CTime = datetime.today().strftime("%I:%M %p")
     return CTime
 
@@ -38,13 +35,13 @@ def read_json(filename: str) -> dict:
     return dict(eval(data))
 
 
-def get_ClassTime(filename: str, day: str):
+def get_class_time(filename: str, day: str):
     timetable_json = read_json(filename)
     Times = timetable_json["course"]["MCA"]["Days"][day]["Time"][0].keys()
     return Times, timetable_json
 
 
-def getJsonData(formattedJson: str, day: str, filename: str, Time: str, course: str):
+def get_json_data(formattedJson: str, day: str, filename: str, Time: str, course: str):
     Sub = formattedJson["course"][course]["Days"][day]["Time"][0][Time][0]["Sub"]
     Sub_code = formattedJson["course"][course]["Days"][day]["Time"][0][Time][0]["Sub_code"]
     Prof = formattedJson["course"][course]["Days"][day]["Time"][0][Time][0]["Prof"]
@@ -53,12 +50,12 @@ def getJsonData(formattedJson: str, day: str, filename: str, Time: str, course: 
 
 
 if __name__ == "__main__":
-    Times, timetable_json = get_ClassTime(MyJson, get_Dayname())
+    Times, timetable_json = get_class_time(MyJson, get_day_name())
     for Time in Times:
-        if Time == get_SysTime():
+        if Time == get_sys_time():
             print("Time For Class Sending Notification")
-            Sub, Sub_code, Prof, Description = getJsonData(
-                timetable_json, get_Dayname(), MyJson, Time, Course1)
-            message = ["You have Class Guys :", "Subject : " + Sub,
-                       "Subject Code :" + Sub_code, "Professor " + Prof, Description]
+            Sub, Sub_code, Prof, Description = get_json_data(
+                timetable_json, get_day_name(), MyJson, Time, Course1)
+            message = ["You have Class Guys :-", "Subject : " + Sub,
+                        "Subject Code : " + Sub_code, "Professor : " + Prof, Description]
             send_messegse(MNumber, message)
