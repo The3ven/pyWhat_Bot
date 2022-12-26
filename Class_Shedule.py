@@ -10,6 +10,7 @@ MNumber = os.environ.get("User_MN")
 MyJson = os.environ.get("TimeTable")
 Course1 = os.environ.get("Course1")
 
+
 def send_messegse(user, messages):
     messenger = WhatsApp()
     messenger.find_user(user)
@@ -29,14 +30,19 @@ def get_sys_time():
 
 
 def read_json(filename: str) -> dict:
-    with open(filename, "r") as f:
-        data = f.read()
-
+    try:
+        with open(filename, "r") as f:
+            data = f.read()
+    except IOError as bug:
+        print("Could not read file:" + {bug})
     return dict(eval(data))
 
 
 def get_class_time(filename: str, day: str):
-    timetable_json = read_json(filename)
+    try:
+        timetable_json = read_json(filename)
+    except Exception as bug:
+        print("Could not parse Json File" + {bug})
     Times = timetable_json["course"]["MCA"]["Days"][day]["Time"][0].keys()
     return Times, timetable_json
 
@@ -57,5 +63,5 @@ if __name__ == "__main__":
             Sub, Sub_code, Prof, Description = get_json_data(
                 timetable_json, get_day_name(), MyJson, Time, Course1)
             message = ["You have Class Guys :-", "Subject : " + Sub,
-                        "Subject Code : " + Sub_code, "Professor : " + Prof, Description]
+                       "Subject Code : " + Sub_code, "Professor : " + Prof, Description]
             send_messegse(MNumber, message)
