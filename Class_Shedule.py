@@ -162,15 +162,12 @@ def main():
                 send_messegse(MNumber, message)
             else:
                 count = count + 1
-                print("Hello From Else L166")
                 if (count == 6):
                     print(count)
                     count = 0
-                    print("Count set to 0 again")
                     if last_flag == False:
-                        print("Hello From Flag L171")
+                        print("Running Bot First time")
                     else:
-                        print("line 176")
                         sleep_sec = get_time_in_sec("00:01:00 ")
                         print("Sleep for {} Second".format(sleep_sec))
                         time.sleep(sleep_sec)
