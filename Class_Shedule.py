@@ -1,4 +1,5 @@
 from datetime import datetime
+import traceback
 from alright import WhatsApp
 from dotenv import load_dotenv
 import os
@@ -25,7 +26,7 @@ def get_day_name():
 
 
 def get_sys_time():
-    CTime = datetime.today().strftime("%I:%M %p")
+    CTime = datetime.today().strftime("%I:%M:%S %p")
     return CTime
 
 
@@ -48,10 +49,42 @@ def get_class_time(filename: str, day: str):
 
 
 def get_json_data(formattedJson: str, day: str, filename: str, Time: str, course: str):
-    Sub = formattedJson["course"][course]["Days"][day]["Time"][0][Time][0]["Sub"]
-    Sub_code = formattedJson["course"][course]["Days"][day]["Time"][0][Time][0]["Sub_code"]
-    Prof = formattedJson["course"][course]["Days"][day]["Time"][0][Time][0]["Prof"]
-    Description = formattedJson["course"][course]["Days"][day]["Time"][0][Time][0]["Description"]
+    try:
+        Sub = formattedJson["course"][course]["Days"][day]["Time"][0][Time][0]["Sub"]
+    except Exception:
+        print("Warning => We can`t Find Key For Subject Error : \n{}".format(
+            traceback.format_exc()))
+        Sub = None
+    finally:
+        pass
+
+    try:
+        Sub_code = formattedJson["course"][course]["Days"][day]["Time"][0][Time][0]["Sub_code"]
+    except Exception:
+        print("Warning => We can`t Find Key For Subject Code Error : \n{}".format(
+            traceback.format_exc()))
+        Sub_code = None
+    finally:
+        pass
+
+    try:
+        Prof = formattedJson["course"][course]["Days"][day]["Time"][0][Time][0]["Prof"]
+    except Exception:
+        print("Warning => We can`t Find Key For Professor Name Error : \n{}".format(
+            traceback.format_exc()))
+        Prof = None
+    finally:
+        pass
+
+    try:
+        Description = formattedJson["course"][course]["Days"][day]["Time"][0][Time][0]["Description"]
+    except Exception:
+        print("Warning => We can`t Find Key For Discription Error : \n{}".format(
+            traceback.format_exc()))
+        Description = None
+    finally:
+        pass
+    
     return Sub, Sub_code, Prof, Description
 
 
