@@ -3,7 +3,7 @@ import traceback
 from alright import WhatsApp
 from dotenv import load_dotenv
 import os
-
+import time
 
 # Setup env
 load_dotenv()
@@ -29,6 +29,14 @@ def get_sys_time():
     CTime = datetime.today().strftime("%I:%M:%S %p")
     return CTime
 
+
+def get_sys_time_12_hr_sec():
+    t = time.localtime(time.time())
+    min_sec = t.tm_min*60
+    hr_sec = t.tm_hour*60*60
+    hour_12_sec = hr_sec % 12
+    total_sec_12_hr = t.tm_sec + min_sec + hour_12_sec
+    return total_sec_12_hr
 
 def read_json(filename: str) -> dict:
     try:
@@ -84,17 +92,23 @@ def get_json_data(formattedJson: str, day: str, filename: str, Time: str, course
         Description = None
     finally:
         pass
-    
+
     return Sub, Sub_code, Prof, Description
 
 
 if __name__ == "__main__":
-    Times, timetable_json = get_class_time(MyJson, get_day_name())
-    for Time in Times:
-        if Time == get_sys_time():
-            print("Time For Class Sending Notification")
-            Sub, Sub_code, Prof, Description = get_json_data(
-                timetable_json, get_day_name(), MyJson, Time, Course1)
-            message = ["You have Class Guys :-", "Subject : " + Sub,
-                       "Subject Code : " + Sub_code, "Professor : " + Prof, Description]
-            send_messegse(MNumber, message)
+    start = 5
+    start_time = get_sys_time_12_hr_sec() + start
+    while True:
+        total_sec_12_hr = get_sys_time_12_hr_sec()
+        remain = start_time - total_sec_12_hr
+        Times, timetable_json = get_class_time(MyJson, get_day_name())
+        print("Our Notification Bot Will Start in {}".format(remain))
+        for Time in Times:
+            if Time == get_sys_time():
+                print("Time For Class Sending Notification")
+                Sub, Sub_code, Prof, Description = get_json_data(
+                    timetable_json, get_day_name(), MyJson, Time, Course1)
+                message = ["You have Class Guys :-", "Subject : " + Sub,
+                        "Subject Code : " + Sub_code, "Professor : " + Prof, Description]
+                send_messegse(MNumber, message)
