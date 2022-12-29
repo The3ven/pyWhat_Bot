@@ -54,7 +54,7 @@ def get_time_in_sec(time: str = get_sys_time()):
     sec_hour = hour*60*60
     sec_min = min*60
     total_sec = sec_hour + sec_min + sec
-    return total_sec  # ,hour,min,sec
+    return total_sec
 
 
 def get_sys_time_24_hr_sec():
@@ -163,18 +163,17 @@ def main():
             else:
                 count = count + 1
                 if (count == 6):
-                    print(count)
                     count = 0
                     if last_flag == False:
                         print("Running Bot First time")
                     else:
-                        sleep_sec = get_time_in_sec("00:01:00 ")
+                        sleep_sec = get_time_in_sec("00:59:30 ")
                         print("Sleep for {} Second".format(sleep_sec))
                         time.sleep(sleep_sec)
 
 
 if __name__ == "__main__":
-    start = 5
+    start = get_time_in_sec("00:05:00")
     start_time = get_sys_time_12_hr_sec() + start
     while True:
         total_sec_12_hr = get_sys_time_12_hr_sec()
