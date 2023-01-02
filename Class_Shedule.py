@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime
 import traceback
 from alright import WhatsApp
@@ -10,6 +11,38 @@ load_dotenv()
 MNumber = os.environ.get("User_MN")
 MyJson = os.environ.get("TimeTable")
 Course1 = os.environ.get("Course1")
+
+# Add log handlers
+logger = logging.getLogger()
+logger.setLevel(logging.NOTSET)
+
+# our first handler is a console handler
+console_handler = logging.StreamHandler()
+console_handler.setLevel(logging.ERROR)
+console_handler_format = '%(asctime)s | %(levelname)s: %(message)s'
+console_handler.setFormatter(logging.Formatter(console_handler_format))
+logger.addHandler(console_handler)
+
+# the second handler is a file handler
+file_handler = logging.FileHandler('sample.log')
+file_handler.setLevel(logging.INFO)
+file_handler_format = '%(asctime)s | %(levelname)s | %(lineno)d: %(message)s'
+file_handler.setFormatter(logging.Formatter(file_handler_format))
+logger.addHandler(file_handler)
+
+
+
+
+def remtime(stime: int, ctime: int):
+    remain = stime - ctime
+
+    return (remain)
+
+def sleep_sunday():
+    Sunday = get_time_in_sec("12:00:00")
+    if get_day_name() == "Sunday":
+        logger.warning("Today is Sunday, I need to rest for the day!")
+        time.sleep(Sunday)
 
 
 def send_messegse(user, messages):
@@ -70,7 +103,7 @@ def read_json(filename: str) -> dict:
         with open(filename, "r") as f:
             data = f.read()
     except IOError as bug:
-        print("Could not read file:" + {bug})
+        logger.warning("Could not read file:" + {bug})
     return dict(eval(data))
 
 
@@ -78,8 +111,13 @@ def get_class_time(filename: str, day: str):
     try:
         timetable_json = read_json(filename)
     except Exception as bug:
-        print("Could not parse Json File" + {bug})
-    Times = timetable_json["course"]["MCA"]["Days"][day]["Time"][0].keys()
+        logger.warning("Could not parse Json File" + {bug})
+    try:
+        Times = timetable_json["course"]["MCA"]["Days"][day]["Time"][0].keys()
+    except Exception:
+        logger.warning("Warning => We can`t Find Key For Discription Error : \n{}".format(
+            traceback.format_exc()))
+
     return Times, timetable_json
 
 
@@ -87,7 +125,7 @@ def get_json_data(formattedJson: str, day: str, filename: str, Time: str, course
     try:
         Sub = formattedJson["course"][course]["Days"][day]["Time"][0][Time][0]["Sub"]
     except Exception:
-        print("Warning => We can`t Find Key For Subject Error : \n{}".format(
+        logger.warning("Warning => We can`t Find Key For Subject Error : \n{}".format(
             traceback.format_exc()))
         Sub = None
     finally:
@@ -96,7 +134,7 @@ def get_json_data(formattedJson: str, day: str, filename: str, Time: str, course
     try:
         Sub_code = formattedJson["course"][course]["Days"][day]["Time"][0][Time][0]["Sub_code"]
     except Exception:
-        print("Warning => We can`t Find Key For Subject Code Error : \n{}".format(
+        logger.warning("Warning => We can`t Find Key For Subject Code Error : \n{}".format(
             traceback.format_exc()))
         Sub_code = None
     finally:
@@ -105,7 +143,7 @@ def get_json_data(formattedJson: str, day: str, filename: str, Time: str, course
     try:
         Prof = formattedJson["course"][course]["Days"][day]["Time"][0][Time][0]["Prof"]
     except Exception:
-        print("Warning => We can`t Find Key For Professor Name Error : \n{}".format(
+        logger.warning("Warning => We can`t Find Key For Professor Name Error : \n{}".format(
             traceback.format_exc()))
         Prof = None
     finally:
@@ -114,7 +152,7 @@ def get_json_data(formattedJson: str, day: str, filename: str, Time: str, course
     try:
         Description = formattedJson["course"][course]["Days"][day]["Time"][0][Time][0]["Description"]
     except Exception:
-        print("Warning => We can`t Find Key For Discription Error : \n{}".format(
+        logger.warning("Warning => We can`t Find Key For Discription Error : \n{}".format(
             traceback.format_exc()))
         Description = None
     finally:
@@ -124,27 +162,27 @@ def get_json_data(formattedJson: str, day: str, filename: str, Time: str, course
 
 
 def main():
+    sleep_sunday()
     Times, timetable_json = get_class_time(MyJson, get_day_name())
     total_sec_24_hr = get_sys_time_24_hr_sec()
     last_flag = False
-    Sunday = (60*60*33 - 5)
     Sleep_from_evening = (60*60*16 - 5)
     count = 0
+    sleep_flag = 0
     while True:
-        if get_day_name() == "Sunday":
-            time.sleep(Sunday)
-        if total_sec_12_hr == 18000:
+        if get_sys_time_12_hr_sec() == 18000:
             time.sleep(Sleep_from_evening)
-        if total_sec_24_hr < 32390:
-            print("Sleeping For {}".format(32390 - total_sec_24_hr))
-            sleep_midnight = 32390 - total_sec_24_hr
-            time.sleep(sleep_midnight)
+        if get_sys_time_24_hr_sec() < 32395:
+            while get_sys_time_24_hr_sec() < 32395:
+                logger.info("Sleeping For {} \nsleep from {} Minutes".format(remtime(32390, get_sys_time_24_hr_sec()), sleep_flag*10))
+                time.sleep(get_time_in_sec("00:10:00"))
+                sleep_flag + 1
         for Time in Times:
             if Time == get_sys_time():
                 global last_time_run
                 last_time_run = Time
                 last_flag = True
-                print("Time For Class Sending Notification")
+                logger.warning("Time For Class Sending Notification")
                 Sub, Sub_code, Prof, Description = get_json_data(
                     timetable_json, get_day_name(), MyJson, Time, Course1)
 
@@ -165,22 +203,21 @@ def main():
                 if (count == 6):
                     count = 0
                     if last_flag == False:
-                        print("Running Bot First time")
+                        logger.warning("Running Bot First time")
                     else:
                         sleep_sec = get_time_in_sec("00:59:30 ")
-                        print("Sleep for {} Second".format(sleep_sec))
+                        logger.info("Sleep for {} Second".format(sleep_sec))
                         time.sleep(sleep_sec)
 
 
 if __name__ == "__main__":
-    start = get_time_in_sec("00:05:00")
+    start = get_time_in_sec("00:00:03")
     start_time = get_sys_time_12_hr_sec() + start
     while True:
-        total_sec_12_hr = get_sys_time_12_hr_sec()
-        remain = start_time - total_sec_12_hr
+        remain = remtime(start_time, get_sys_time_12_hr_sec())
         print(
             "Our Notification Bot Will Start in {}".format(remain))
-        if total_sec_12_hr == start_time:
+        if get_sys_time_12_hr_sec() == start_time:
             main()
         else:
             time.sleep(1)
