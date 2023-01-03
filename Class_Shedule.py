@@ -31,11 +31,10 @@ file_handler.setFormatter(logging.Formatter(file_handler_format))
 logger.addHandler(file_handler)
 
 
-
-
 def remtime(stime: int, ctime: int):
     remain = stime - ctime
     return (remain)
+
 
 def sleep_sunday():
     Sunday = get_time_in_sec("12:00:00")
@@ -173,7 +172,8 @@ def main():
             time.sleep(Sleep_from_evening)
         if get_sys_time_24_hr_sec() < 32395:
             while get_sys_time_24_hr_sec() < 32395:
-                logger.info("Sleeping For {} \nsleep from {} Minutes".format(remtime(32390, get_sys_time_24_hr_sec()), sleep_flag*10))
+                logger.info("Sleeping For {} \nsleep from {} Minutes".format(
+                    remtime(32390, get_sys_time_24_hr_sec()), sleep_flag*10))
                 time.sleep(get_time_in_sec("00:10:00"))
                 sleep_flag + 1
         for Time in Times:
@@ -204,12 +204,13 @@ def main():
                     if last_flag == False:
                         logger.warning("Running Bot First time")
                         while get_sys_time_24_hr_sec() > 61139:
-                            logger.warning("Current time is \n{} ...\nWe need to sleep till Morning\nsleep from {} Minutes...".format(get_sys_time(),sleep_flag*10))
+                            logger.warning("Current time is \n{} ...\nWe need to sleep till Morning\nsleep from {} Minutes...".format(
+                                get_sys_time(), sleep_flag*10))
                             print("Taking 5 minute power nap")
                             time.sleep(get_time_in_sec("00:10:00"))
                             sleep_flag + 1
                     else:
-                        sleep_sec = get_time_in_sec("00:59:30 ")
+                        sleep_sec = get_time_in_sec("00:59:30")
                         logger.info("Sleep for {} Second".format(sleep_sec))
                         time.sleep(sleep_sec)
 
