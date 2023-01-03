@@ -24,7 +24,7 @@ console_handler.setFormatter(logging.Formatter(console_handler_format))
 logger.addHandler(console_handler)
 
 # the second handler is a file handler
-file_handler = logging.FileHandler('sample.log')
+file_handler = logging.FileHandler('Shedule.log')
 file_handler.setLevel(logging.INFO)
 file_handler_format = '%(asctime)s | %(levelname)s | %(lineno)d: %(message)s'
 file_handler.setFormatter(logging.Formatter(file_handler_format))
@@ -35,7 +35,6 @@ logger.addHandler(file_handler)
 
 def remtime(stime: int, ctime: int):
     remain = stime - ctime
-
     return (remain)
 
 def sleep_sunday():
@@ -204,6 +203,11 @@ def main():
                     count = 0
                     if last_flag == False:
                         logger.warning("Running Bot First time")
+                        while get_sys_time_24_hr_sec() > 61139:
+                            logger.warning("Current time is \n{} ...\nWe need to sleep till Morning\nsleep from {} Minutes...".format(get_sys_time(),sleep_flag*10))
+                            print("Taking 5 minute power nap")
+                            time.sleep(get_time_in_sec("00:10:00"))
+                            sleep_flag + 1
                     else:
                         sleep_sec = get_time_in_sec("00:59:30 ")
                         logger.info("Sleep for {} Second".format(sleep_sec))
