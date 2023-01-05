@@ -210,11 +210,9 @@ def main():
             logger.warning("Running Bot First time")
             remsec = get_time_in_sec(get_rtime(get_sys_time()))
             sleepsec = get_time_in_sec(get_sys_time()) + remsec
-            logger.warning(
-                f"Remain is {remsec} current is {get_time_in_sec(get_sys_time())} mix seconds is {sleepsec}")
             if get_time_in_sec(get_sys_time()) < sleepsec:
                 logger.warning(
-                    f"Current time is ::- {get_sys_time()} ...\nWe need to sleep till {sleepsec} second \ncurrent second is {get_time_in_sec(get_sys_time())} remain {sleepsec - get_time_in_sec(get_sys_time())}")
+                    f"Current time is {get_sys_time()} ...\nWe need to sleep till {sleepsec} second \ncurrent second is {get_time_in_sec(get_sys_time())} remain {sleepsec - get_time_in_sec(get_sys_time())}")
                 time.sleep(sleepsec - get_time_in_sec(get_sys_time()) - 60)
             elif else_flag == True:
                 sleep_sec = get_time_in_sec("01:00:00")
