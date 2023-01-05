@@ -116,13 +116,6 @@ def get_rtime(time: str):
     remaintime = "00:"+str(remmin)+":"+str(remsec)
     return remaintime
 
-# def get_sys_time_24_hr_sec():
-#     t = time.localtime(time.time())
-#     min_sec = t.tm_min*60
-#     hr_24_sec = t.tm_hour*60*60
-#     total_sec_24_hr = t.tm_sec + min_sec + hr_24_sec
-#     return total_sec_24_hr
-
 
 def read_json(filename: str) -> dict:
     try:
@@ -191,12 +184,8 @@ def main():
     sleep_sunday()
     last_flag = False
     while True:
-        print("Hello")
         Times, timetable_json = get_class_time(MyJson, get_day_name())
         for Time in Times:
-            print(f"Time is {Time}")
-            print(
-                f"Current time is :- {get_sys_time()}")
             if Time == get_sys_time():
                 logger.info(f"Last time we send notification {Time}")
                 logger.warning("Time For Class Sending Notification")
@@ -216,18 +205,20 @@ def main():
                     message = message + [Description]
                 send_messegse(MNumber, message)
                 else_flag = True
+                last_flag == True
         if last_flag == False:
-            print("Running Bot First time")
+            logger.warning("Running Bot First time")
             remsec = get_time_in_sec(get_rtime(get_sys_time()))
             sleepsec = get_time_in_sec(get_sys_time()) + remsec
-            print(f"Remain is {remsec} current is {get_time_in_sec(get_sys_time())} mix seconds is {sleepsec}")
+            logger.warning(
+                f"Remain is {remsec} current is {get_time_in_sec(get_sys_time())} mix seconds is {sleepsec}")
             if get_time_in_sec(get_sys_time()) < sleepsec:
-                print(
+                logger.warning(
                     f"Current time is ::- {get_sys_time()} ...\nWe need to sleep till {sleepsec} second \ncurrent second is {get_time_in_sec(get_sys_time())} remain {sleepsec - get_time_in_sec(get_sys_time())}")
-                time.sleep(sleepsec - get_time_in_sec(get_sys_time()) - 60 )
+                time.sleep(sleepsec - get_time_in_sec(get_sys_time()) - 60)
             elif else_flag == True:
                 sleep_sec = get_time_in_sec("01:00:00")
-                print(f"Sleep for {sleep_sec} Second")
+                logger.warning(f"Sleep for {sleep_sec} Second")
                 time.sleep(sleep_sec)
 
 
@@ -236,11 +227,11 @@ if __name__ == "__main__":
     start_time = get_sys_time_12_hr_sec() + start
     dot = "."
     pdot = "."
-    print(
+    logger.warning(
         "Our Notification Bot Will Start in ...")
     while True:
         remain = remtime(start_time, get_sys_time_12_hr_sec())
-        print(f"{remain}" + f"{dot}")
+        logger.warning(f"{remain}" + f"{dot}")
         dot = dot + pdot
         if get_sys_time_12_hr_sec() == start_time:
             main()
