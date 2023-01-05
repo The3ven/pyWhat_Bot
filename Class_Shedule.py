@@ -1,3 +1,5 @@
+#!/bin/python3
+
 import logging
 from datetime import datetime
 import traceback
@@ -12,6 +14,11 @@ MNumber = os.environ.get("User_MN")
 MyJson = os.environ.get("TimeTable")
 Course1 = os.environ.get("Course1")
 
+# Set log file in Document dir
+home_directory = os.path.expanduser('~')
+logpath = os.path.join(home_directory, 'Documents', 'Shedule.log')
+
+
 # Add log handlers
 logger = logging.getLogger()
 logger.setLevel(logging.NOTSET)
@@ -24,7 +31,7 @@ console_handler.setFormatter(logging.Formatter(console_handler_format))
 logger.addHandler(console_handler)
 
 # the second handler is a file handler
-file_handler = logging.FileHandler('Shedule.log')
+file_handler = logging.FileHandler(logpath)
 file_handler.setLevel(logging.INFO)
 file_handler_format = '%(asctime)s | %(levelname)s | %(lineno)d: %(message)s'
 file_handler.setFormatter(logging.Formatter(file_handler_format))
@@ -70,7 +77,7 @@ def get_sys_time_12_hr_sec():
     return total_sec_12_hr
 
 
-def get_time_in_sec(time: str = get_sys_time()):
+def get_time_in_sec(time: str):
     if time.endswith("AM"):
         time = time.replace("AM", "")
     else:
@@ -88,12 +95,33 @@ def get_time_in_sec(time: str = get_sys_time()):
     return total_sec
 
 
-def get_sys_time_24_hr_sec():
-    t = time.localtime(time.time())
-    min_sec = t.tm_min*60
-    hr_24_sec = t.tm_hour*60*60
-    total_sec_24_hr = t.tm_sec + min_sec + hr_24_sec
-    return total_sec_24_hr
+def get_rtime(time: str):
+    if time.endswith("AM"):
+        time = time.replace("AM", "")
+    else:
+        time = time.replace("PM", "")
+
+    t = time.split(":")
+    h = t[0]
+    m = t[1]
+    s = t[2]
+    hour = int(h)
+    min = int(m)
+    sec = int(s)
+    if hour in range(13):
+        if min in range(60):
+            remmin = 60 - min
+            if sec in range(60):
+                remsec = 60 - sec
+    remaintime = "00:"+str(remmin)+":"+str(remsec)
+    return remaintime
+
+# def get_sys_time_24_hr_sec():
+#     t = time.localtime(time.time())
+#     min_sec = t.tm_min*60
+#     hr_24_sec = t.tm_hour*60*60
+#     total_sec_24_hr = t.tm_sec + min_sec + hr_24_sec
+#     return total_sec_24_hr
 
 
 def read_json(filename: str) -> dict:
@@ -161,26 +189,16 @@ def get_json_data(formattedJson: str, day: str, filename: str, Time: str, course
 
 def main():
     sleep_sunday()
-    Times, timetable_json = get_class_time(MyJson, get_day_name())
-    total_sec_24_hr = get_sys_time_24_hr_sec()
     last_flag = False
-    Sleep_from_evening = (60*60*16 - 5)
-    count = 0
-    sleep_flag = 0
     while True:
-        if get_sys_time_12_hr_sec() == 18000:
-            time.sleep(Sleep_from_evening)
-        if get_sys_time_24_hr_sec() < 32395:
-            while get_sys_time_24_hr_sec() < 32395:
-                logger.info("Sleeping For {} \nsleep from {} Minutes".format(
-                    remtime(32390, get_sys_time_24_hr_sec()), sleep_flag*10))
-                time.sleep(get_time_in_sec("00:10:00"))
-                sleep_flag + 1
+        print("Hello")
+        Times, timetable_json = get_class_time(MyJson, get_day_name())
         for Time in Times:
+            print(f"Time is {Time}")
+            print(
+                f"Current time is :- {get_sys_time()}")
             if Time == get_sys_time():
-                global last_time_run
-                last_time_run = Time
-                last_flag = True
+                logger.info(f"Last time we send notification {Time}")
                 logger.warning("Time For Class Sending Notification")
                 Sub, Sub_code, Prof, Description = get_json_data(
                     timetable_json, get_day_name(), MyJson, Time, Course1)
@@ -197,31 +215,33 @@ def main():
                 if Description is not None:
                     message = message + [Description]
                 send_messegse(MNumber, message)
-            else:
-                count = count + 1
-                if (count == 6):
-                    count = 0
-                    if last_flag == False:
-                        logger.warning("Running Bot First time")
-                        while get_sys_time_24_hr_sec() > 61139:
-                            logger.warning("Current time is \n{} ...\nWe need to sleep till Morning\nsleep from {} Minutes...".format(
-                                get_sys_time(), sleep_flag*10))
-                            print("Taking 5 minute power nap")
-                            time.sleep(get_time_in_sec("00:10:00"))
-                            sleep_flag + 1
-                    else:
-                        sleep_sec = get_time_in_sec("00:59:30")
-                        logger.info("Sleep for {} Second".format(sleep_sec))
-                        time.sleep(sleep_sec)
+                else_flag = True
+        if last_flag == False:
+            print("Running Bot First time")
+            remsec = get_time_in_sec(get_rtime(get_sys_time()))
+            sleepsec = get_time_in_sec(get_sys_time()) + remsec
+            print(f"Remain is {remsec} current is {get_time_in_sec(get_sys_time())} mix seconds is {sleepsec}")
+            if get_time_in_sec(get_sys_time()) < sleepsec:
+                print(
+                    f"Current time is ::- {get_sys_time()} ...\nWe need to sleep till {sleepsec} second \ncurrent second is {get_time_in_sec(get_sys_time())} remain {sleepsec - get_time_in_sec(get_sys_time())}")
+                time.sleep(sleepsec - get_time_in_sec(get_sys_time()) - 60 )
+            elif else_flag == True:
+                sleep_sec = get_time_in_sec("01:00:00")
+                print(f"Sleep for {sleep_sec} Second")
+                time.sleep(sleep_sec)
 
 
 if __name__ == "__main__":
     start = get_time_in_sec("00:00:03")
     start_time = get_sys_time_12_hr_sec() + start
+    dot = "."
+    pdot = "."
+    print(
+        "Our Notification Bot Will Start in ...")
     while True:
         remain = remtime(start_time, get_sys_time_12_hr_sec())
-        print(
-            "Our Notification Bot Will Start in {}".format(remain))
+        print(f"{remain}" + f"{dot}")
+        dot = dot + pdot
         if get_sys_time_12_hr_sec() == start_time:
             main()
         else:
