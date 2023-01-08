@@ -1,0 +1,22 @@
+{
+  "course": {
+    "course_name 'B.Tech'": {
+      "Days": {
+        "Day_name 'Monday'": {
+          "Time": [
+            {
+              "09:00:00 AM": [
+                {
+                  "Sub": "",
+                  "Sub_code": "",
+                  "Prof": "",
+                  "Description": ""
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  }
+}
