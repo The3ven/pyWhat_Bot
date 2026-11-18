@@ -2,7 +2,6 @@
 Schedule is an unofficial python whatsapp wrapper which is allowing you to send notification about class schedule. 
 """
 
-import os
 import time
 from myenv import *
 import traceback
@@ -11,11 +10,7 @@ from alright import WhatsApp
 
 class ClassShedular(object):
     def __init__(self) -> None:
-        self.Sunday = self.get_time_in_sec("12:00:00")
-        self.messenger = WhatsApp()
-        self.messenger.fetch_all_unread_chats(limit=True, top=30)
-        # self.messenger.browser.quit()
-        
+        self.Sunday = self.get_time_in_sec("12:00:00")        
     
     def remtime(self, stime: int, ctime: int):
         remain = stime - ctime
@@ -27,9 +22,12 @@ class ClassShedular(object):
             time.sleep(self.Sunday)
 
     def send_messegse(self, user, messages):
+        self.messenger = WhatsApp()
         self.messenger.find_user(user)
         for message in messages:
             self.messenger.send_message(message)
+            pass
+        self.messenger.browser.quit()
 
     def read_json(self,filename: str) -> dict:
         try:
@@ -192,18 +190,18 @@ class ClassShedular(object):
                     self.send_messegse(MNumber, message)
                     else_flag = True
                     last_flag == True
-            # if last_flag == False:
-            #     print("Running Bot First time")
-            #     remsec = self.get_time_in_sec(self.get_rtime(self.get_sys_time()))
-            #     sleepsec = self.get_time_in_sec(self.get_sys_time()) + remsec
-            #     if self.get_time_in_sec(self.get_sys_time()) < sleepsec:
-            #         print(
-            #             f"Current time is {self.get_sys_time()} ...\nWe need to sleep till {sleepsec} second \ncurrent second is {self.get_time_in_sec(self.get_sys_time())} remain {sleepsec - self.get_time_in_sec(self.get_sys_time())}")
-            #         time.sleep(sleepsec - self.get_time_in_sec(self.get_sys_time()) - 60)
-            #     elif else_flag == True:
-            #         sleep_sec = self.get_time_in_sec("01:00:00")
-            #         print(f"Sleep for {sleep_sec} Second")
-            #         time.sleep(sleep_sec)
+            if last_flag == False:
+                print("Running Bot First time")
+                remsec = self.get_time_in_sec(self.get_rtime(self.get_sys_time()))
+                sleepsec = self.get_time_in_sec(self.get_sys_time()) + remsec
+                if self.get_time_in_sec(self.get_sys_time()) < sleepsec:
+                    print(
+                        f"Current time is {self.get_sys_time()} ...\nWe need to sleep till {sleepsec} second \ncurrent second is {self.get_time_in_sec(self.get_sys_time())} remain {sleepsec - self.get_time_in_sec(self.get_sys_time())}")
+                    time.sleep(sleepsec - self.get_time_in_sec(self.get_sys_time()) - 60)
+                elif else_flag == True:
+                    sleep_sec = self.get_time_in_sec("01:00:00")
+                    print(f"Sleep for {sleep_sec} Second")
+                    time.sleep(sleep_sec)
 
 
 if __name__ == "__main__":
